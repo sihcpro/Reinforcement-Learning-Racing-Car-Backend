@@ -1,0 +1,2 @@
+save,car_name,move,rad,x,y,speed,point,status,l2,l1,m,r1,r2,max_leng_sensor,count
+1,car1,0,3.14,25,15,0,1,1,346,600,2000,599,346,2000,0

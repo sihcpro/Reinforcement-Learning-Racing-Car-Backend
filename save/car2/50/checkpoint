@@ -1,0 +1,6 @@
+model_checkpoint_path: "save50"
+all_model_checkpoint_paths: "../20/save20"
+all_model_checkpoint_paths: "../30/save30"
+all_model_checkpoint_paths: "../40/save40"
+all_model_checkpoint_paths: "../tmp/44.Tue,04-Dec-2018,13:16:20,"
+all_model_checkpoint_paths: "save50"

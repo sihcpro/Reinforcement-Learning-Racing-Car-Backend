@@ -1,0 +1,4 @@
+model_checkpoint_path: "save42"
+all_model_checkpoint_paths: "../21/save22"
+all_model_checkpoint_paths: "../31/save32"
+all_model_checkpoint_paths: "save42"
