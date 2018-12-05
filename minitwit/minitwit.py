@@ -315,7 +315,7 @@ LR_C = 1e-4  # learning rate for critic
 REPLACE_ITER_A = 800
 REPLACE_ITER_C = 700
 GAMMA = 0.9  # reward discount
-MEMORY_CAPACITY = 20000
+MEMORY_CAPACITY = 2000
 # sess = tf.Session()
 
 # Create actor and critic.
@@ -413,18 +413,17 @@ def initPath(car):
 
 graph = tf.get_default_graph()
 def initInviroment(car):
-	# global CAR
-	# global MAX_CAR
+	if car.name in ['car1', 'car2']:
+		actor_name = 'Actor'
+		critic_name = 'Critic'
+	else:
+		actor_name = "Actor_"+car.name
+		critic_name = "Critic_"+car.name
 
-	# global tmp_sess
-	# global sess
-	# global actor
-	# global critic
-	# global saver
 	with graph.as_default():
 		car.sess = tf.Session()
-		car.actor = Actor(car.sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor_"+car.name)
-		car.critic = Critic(car.sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, car.actor.a, car.actor.a_, "Critic_"+car.name)
+		car.actor = Actor(car.sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, actor_name)
+		car.critic = Critic(car.sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, car.actor.a, car.actor.a_, critic_name)
 		car.actor.add_grad_to_graph(car.critic.a_grads)
 		car.saver = tf.train.Saver()
 		car.sess.run(tf.global_variables_initializer())
@@ -461,6 +460,9 @@ def getTrain(car_name):
 
 	return json.dumps({'message': 'Train car', 'exist': False, 'readyState': 4, 'status': 200})
 
+VAR_MIN = 0.1
+STATE_DIM = 5
+BATCH_SIZE = 16
 @app.route('/train/<data>', methods=['GET'])
 def train(data):
 	global mark_point
@@ -478,6 +480,7 @@ def train(data):
 		car = CAR[car_name]
 
 		print('train', 'actor', car.actor)
+		print('train', 'Memory', car.M)
 
 		sensors = tmp[len(PRE_COLUMNS):NUM_VARIABLES - len(AFT_COLUMS)]
 		max_leng_sensor = int(tmp[-1])
@@ -490,7 +493,7 @@ def train(data):
 		# Added exploration noise
 		a = car.actor.choose_action(car.s)
 		# add randomness to action selection for exploration
-		car.a = np.clip(np.random.normal(a, car.var), *ACTION_BOUND)
+		a = np.clip(np.random.normal(a, car.var), *ACTION_BOUND)
 		s_ = np.array(sensors)
 		done = False
 
@@ -526,7 +529,7 @@ def train(data):
 		car.M.store_transition(car.s, a, r, s_)
 
 		if car.M.pointer > MEMORY_CAPACITY:
-			car.var = max([var*.9995, VAR_MIN])    # decay the action randomness
+			car.var = max([car.var*.9995, VAR_MIN])    # decay the action randomness
 			b_M = car.M.sample(BATCH_SIZE)
 			b_s = b_M[:, :STATE_DIM]
 			b_a = b_M[:, STATE_DIM: STATE_DIM + ACTION_DIM]
