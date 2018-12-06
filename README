@@ -1,18 +1,14 @@
+        What is my project?
 
-                        / MiniTwit /
+        A project use minitwit and Reinforcemt learning to training and manage car's model
+        Front-end at: https://github.com/sihcpro/Reinforcement-Learning-Racing-Car-Frontend
 
-           because writing todo lists is not fun
 
+        How do I use it?
 
-    ~ What is MiniTwit?
+      1. install requirement.txt file to pip by
 
-      A SQLite and Flask powered twitter clone
-
-    ~ How do I use it?
-
-      1. edit the configuration in the minitwit.py file or
-         export an MINITWIT_SETTINGS environment variable
-         pointing to a configuration file.
+         pip install -r requirement.txt
 
       2. install the app from the root of the project directory
 
@@ -21,19 +17,13 @@
       3. tell flask about the right application:
 
          export FLASK_APP=minitwit
+         export NUM_SENSORS=5
 
-      4. fire up a shell and run this:
+         showing this export by: make init
 
-         flask initdb
+      4. now you can run minitwit:
 
-      5. now you can run minitwit:
-
-         flask run
+         make start
 
          the application will greet you on
          http://localhost:5000/
-
-    ~ Is it tested?
-
-      You betcha.  Run the `python setup.py test` file to
-      see the tests pass.
