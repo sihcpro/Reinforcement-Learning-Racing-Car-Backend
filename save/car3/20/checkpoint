@@ -1,3 +1,2 @@
 model_checkpoint_path: "save20"
-all_model_checkpoint_paths: "../tmp/3.Wed,05-Dec-2018,18:42:24,"
 all_model_checkpoint_paths: "save20"

@@ -37,7 +37,6 @@ LR_C = 1e-4  # learning rate for critic
 GAMMA = 0.9  # reward discount
 REPLACE_ITER_A = 800
 REPLACE_ITER_C = 700
-MEMORY_CAPACITY = 3000
 BATCH_SIZE = 16
 VAR_MIN = 0.1
 RENDER = True

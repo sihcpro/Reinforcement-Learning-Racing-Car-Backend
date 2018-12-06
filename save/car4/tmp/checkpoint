@@ -1,2 +1,4 @@
-model_checkpoint_path: "3.Wed,05-Dec-2018,10:56:49,"
-all_model_checkpoint_paths: "3.Wed,05-Dec-2018,10:56:49,"
+model_checkpoint_path: "33.Wed,05-Dec-2018,23:10:23,"
+all_model_checkpoint_paths: "../20/save20"
+all_model_checkpoint_paths: "../30/save30"
+all_model_checkpoint_paths: "33.Wed,05-Dec-2018,23:10:23,"

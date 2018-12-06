@@ -1,0 +1,5 @@
+model_checkpoint_path: "save20"
+all_model_checkpoint_paths: "../tmp/6.Wed,05-Dec-2018,19:02:37,"
+all_model_checkpoint_paths: "../tmp/14.Wed,05-Dec-2018,19:13:59,"
+all_model_checkpoint_paths: "../tmp/19.Wed,05-Dec-2018,19:27:47,"
+all_model_checkpoint_paths: "save20"

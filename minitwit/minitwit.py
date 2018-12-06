@@ -9,7 +9,7 @@
 	:license: BSD, see LICENSE for more details.
 """
 
-import time, sys, os, shutil, json, _thread
+import time, sys, os, shutil, json
 import numpy as np
 import tensorflow as tf
 from .DDPG import Actor, Critic, Memory
@@ -315,79 +315,21 @@ LR_C = 1e-4  # learning rate for critic
 REPLACE_ITER_A = 800
 REPLACE_ITER_C = 700
 GAMMA = 0.9  # reward discount
-MEMORY_CAPACITY = 2000
-# sess = tf.Session()
-
-# Create actor and critic.
-# actor = Actor(sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor")
-# critic = Critic(sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, actor.a, actor.a_, "Critic")
-# actor.add_grad_to_graph(critic.a_grads)
-# saver = tf.train.Saver(defer_build=True)
-
-# M = Memory(MEMORY_CAPACITY, dims=2 * STATE_DIM + ACTION_DIM + 1)
-# s = np.array([1,1,1,1,1])
-# r_ = 0
-# ep_step = 0
-# var = 2.
-# max_point = 3
-# count_finish = 0
+MEMORY_CAPACITY = 5000
 
 PATH = './save'
 TMP_PATH = os.path.join(PATH, "tmp")
 mark_point = [20, 30, 40, 50, 60]
 MAX_CAR = 1
 
-# sess1 = tf.Session()
-# actor1 = Actor(sess1, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor_car1")
-# critic1 = Critic(sess1, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, actor1.a, actor1.a_, "Critic_car1")
-# actor1.add_grad_to_graph(critic1.a_grads)
-# sess1.run(tf.global_variables_initializer())
-# saver1 = tf.train.Saver()
-# saver1.restore(sess1, tf.train.latest_checkpoint('./save/car1/20'))
-
-
-# sess = []
-# actor = []
-# critic = []
-# saver = []
-# tmp_sess = tf.Session()
-# graph = tf.get_default_graph()
-# for i in range(MAX_CAR):
-# 	tmp_actor = Actor(tmp_sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor"+str(i))
-# 	tmp_critic = Critic(tmp_sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, tmp_actor.a, tmp_actor.a_, "Critic"+str(i))
-# 	tmp_actor.add_grad_to_graph(tmp_critic.a_grads)
-# 	tmp_sess.run(tf.global_variables_initializer())
-# 	tmp_saver = tf.train.Saver()
-
-# 	sess.append(tmp_sess)
-# 	actor.append(tmp_actor)
-# 	critic.append(tmp_critic)
-# 	saver.append(tmp_saver)
-# tmp_sess.run(tf.global_variables_initializer())
-# tmp_saver = tf.train.Saver()
-
-# def initGlobal(name, tmp_sess):
-# 	with graph.as_default():
-# 		print('init', name)
-# 		tmp_actor = Actor(tmp_sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor"+name)
-# 		tmp_critic = Critic(tmp_sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, tmp_actor.a, tmp_actor.a_, "Critic"+name)
-# 		tmp_actor.add_grad_to_graph(tmp_critic.a_grads)
-
-# list_file = []
-# def folderChange(tmp_sess):
-# 	global list_file
-
-# 	while True:
-# 		tmp_list_file = os.listdir('./save')
-# 		if len(tmp_list_file) != len(list_file):
-# 			for file in tmp_list_file:
-# 				if not file in list_file:
-# 					initGlobal(file, tmp_sess)
-# 					list_file.append(file)
-# 		time.sleep(1)
-
-
-# _thread.start_new_thread(folderChange, (tmp_sess,))
+graph = tf.get_default_graph()
+# with graph.as_default():
+# 	sess = tf.Session()
+# 	actor = Actor(sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, 'Actor')
+# 	critic = Critic(sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, actor.a, actor.a_, 'Critic')
+# 	actor.add_grad_to_graph(critic.a_grads)
+# 	sess.run(tf.global_variables_initializer())
+# 	saver = tf.train.Saver()
 
 def initPath(car):
 	global mark_point
@@ -405,29 +347,34 @@ def initPath(car):
 		mark_path = os.path.join(car.path, str(mark))
 		if not os.path.isdir(mark_path):
 			os.mkdir(mark_path)
-# initPath()
-# if LOAD:
-# 	saver.restore(sess, tf.train.latest_checkpoint(path))
-# else:
-# 	sess.run(tf.global_variables_initializer())
 
-graph = tf.get_default_graph()
+# sess = tf.Session()
+# actor = Actor(sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, "Actor")
 def initInviroment(car):
-	if car.name in ['car1', 'car2']:
+	global sess
+	# global actor
+	# global critic
+	global saver
+
+	if car.name == 'car1':
 		actor_name = 'Actor'
 		critic_name = 'Critic'
 	else:
 		actor_name = "Actor_"+car.name
 		critic_name = "Critic_"+car.name
 
+	# print('initInviroment', actor_name)
+
 	with graph.as_default():
 		car.sess = tf.Session()
 		car.actor = Actor(car.sess, ACTION_DIM, ACTION_BOUND[1], LR_A, REPLACE_ITER_A, actor_name)
 		car.critic = Critic(car.sess, STATE_DIM, ACTION_DIM, LR_C, GAMMA, REPLACE_ITER_C, car.actor.a, car.actor.a_, critic_name)
 		car.actor.add_grad_to_graph(car.critic.a_grads)
-		car.saver = tf.train.Saver()
 		car.sess.run(tf.global_variables_initializer())
-	# initGlobal(car.name, tmp_sess)
+		car.saver = tf.train.Saver()
+		# car.sess.run(tf.global_variables_initializer())
+# car = Car('Default', -1)
+# initInviroment(car)
 
 @app.route('/init/<car_name>', methods=['GET'])
 def initCar(car_name):
@@ -438,12 +385,13 @@ def initCar(car_name):
 		return json.dumps({'message': 'Init car', 'exist': True, 'readyState': 4, 'status': 200})
 	else:
 		print('Init car  :', car_name)
-		CAR[car_name] = True
-		CAR[car_name] = Car(car_name, len(CAR)-1)
-		car = CAR[car_name]
-		car.name = car_name
+		car = Car(car_name, len(CAR)-1)
 		initPath(car)
 		initInviroment(car)
+		CAR[car_name] = car
+
+		for key in CAR:
+			print('init', 'car', CAR[key], 'actor', CAR[key].actor)
 
 		return json.dumps({'message': 'Init car', 'exist': False, 'readyState': 4, 'status': 200})
 
@@ -479,15 +427,11 @@ def train(data):
 		car_name = tmp[1]
 		car = CAR[car_name]
 
-		print('train', 'actor', car.actor)
-		print('train', 'Memory', car.M)
-
 		sensors = tmp[len(PRE_COLUMNS):NUM_VARIABLES - len(AFT_COLUMS)]
 		max_leng_sensor = int(tmp[-1])
-		# print(sensors, "/", max_leng_sensor)
 		for i in range(len(sensors)):
 			sensors[i] = float(sensors[i]) / max_leng_sensor
-		print('sensors', sensors)
+		# print(sensors, "/", max_leng_sensor)
 
 		# control exploration
 		# Added exploration noise
@@ -508,7 +452,7 @@ def train(data):
 				if car.r_ >= car.max_point:
 					done = True
 					car.count_finish += 1
-					if car.count_finish == 20:
+					if car.count_finish == 10:
 						car.max_point += 1
 						car.count_finish = 0
 						if car.r_ in mark_point:
@@ -543,7 +487,6 @@ def train(data):
 		car.ep_step += 1
 
 		print(r, '|', car.r_, '|', car.max_point, '|', car.count_finish, '| Return : %2.2f' % a, '| Steps: %i' % int(car.ep_step), '| Memory: %.d' % car.M.pointer, '| Explore: %.2f' % car.var )
-		# print(sensors)
 		print()
 
 		message = '| Memory: %.d' % car.M.pointer + '| Explore: %.2f' % car.var
@@ -562,35 +505,38 @@ def getLoad(car_name):
 
 	returnPackage = {'readyState': 4}
 
-	if car_name in CAR.keys():
-		car = CAR[car_name]
-		if not os.path.isdir(car.path):
-			os.mkdir(car.path)
-			returnPackage['file'] = []
-			print("create dir")
+	with graph.as_default():
+		if car_name in CAR.keys():
+			car = CAR[car_name]
+			if not os.path.isdir(car.path):
+				os.mkdir(car.path)
+				returnPackage['file'] = []
+				print("create dir")
+			else:
+				print('path', car.path)
+				print('file', os.listdir(car.path))
+				file = [f for f in os.listdir(car.path)]
+				tmp = []
+				for f in file:
+					if len(os.listdir(os.path.join(car.path, f))) > 0:
+						tmp.append({f: f})
+				print("load dir", tmp)
+				returnPackage['file'] = tmp
 		else:
-			print('path', car.path)
-			print('file', os.listdir(car.path))
-			file = [f for f in os.listdir(car.path)]
-			tmp = []
-			for f in file:
-				if len(os.listdir(os.path.join(car.path, f))) > 0:
-					tmp.append({f: f})
-			print("load dir", tmp)
-			returnPackage['file'] = tmp
-	else:
-		initCar(car_name)
+			initCar(car_name)
 
-	return json.dumps(returnPackage)
+		return json.dumps(returnPackage)
 
 @app.route('/load/<data>', methods=['GET'])
 def load(data):
 	global CAR
 
-	data = data.split(',')
-	car = CAR[data[0]]
-	car.saver.restore(car.sess, tf.train.latest_checkpoint(car.path+'/'+data[1]))
-	return json.dumps({'message': 'done', 'readyState': 4, 'status': 200})
+	with graph.as_default():
+		data = data.split(',')
+		car = CAR[data[0]]
+		print(car.name, car.sess, car)
+		car.saver.restore(car.sess, tf.train.latest_checkpoint(car.path+'/'+data[1]))
+		return json.dumps({'message': 'done', 'readyState': 4, 'status': 200})
 
 @app.route('/run/<data>', methods=['GET'])
 def run(data):
